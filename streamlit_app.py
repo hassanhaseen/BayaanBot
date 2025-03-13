@@ -46,6 +46,17 @@ st.markdown("""
     .stButton > button {
         background: linear-gradient(90deg, #D4AF37, #FFD700);
         color: #0D0D0D;
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
     }
 
     .poetry-output {
@@ -55,8 +66,11 @@ st.markdown("""
         border-radius: 12px;
         border: 2px solid #D4AF3722;
         margin-top: 1.5rem;
-        line-height: 1.8;
-        font-size: 1.2rem;
+        line-height: 2.2;
+        font-size: 1.3rem;
+        text-align: left;
+        white-space: pre-wrap;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
 
     .footer {
@@ -66,7 +80,6 @@ st.markdown("""
         margin-top: 3rem;
         border-top: 1px solid #D4AF3722;
     }
-
     </style>
 """, unsafe_allow_html=True)
 
@@ -137,7 +150,7 @@ with tab1:
         st.subheader("🎯 Start Your Nazam")
         start_text = st.text_input(
             "Starting Words",
-            value="",  # Empty starting input as requested
+            value="",  # Empty by default
             help="Enter your opening words in Roman Urdu"
         )
 
@@ -152,15 +165,42 @@ with tab1:
 
             if poetry:
                 st.markdown("### 📝 Generated Poetry")
-                st.markdown(f'<div class="poetry-output">{poetry}</div>', unsafe_allow_html=True)
 
-                # Save to history (without download option)
+                poetry_lines = poetry.strip().split('\n')
+                formatted_poetry = "<br>".join([f"{line.strip()}" for line in poetry_lines])
+
+                st.markdown(f"""
+                    <div class="poetry-output">
+                        {formatted_poetry}
+                    </div>
+                """, unsafe_allow_html=True)
+
                 save_to_history(poetry, start_text)
 
-                # Copy to clipboard button
-                if st.button("📋 Copy to Clipboard"):
-                    st.write(f'<script>navigator.clipboard.writeText(`{poetry}`);</script>', unsafe_allow_html=True)
-                    st.success("Copied to clipboard!")
+                # Copy to Clipboard button (custom styled)
+                copy_code = f"""
+                <button onclick="navigator.clipboard.writeText(`{poetry}`)" 
+                    style="
+                        display: block;
+                        margin-top: 1rem;
+                        padding: 0.75rem 1.5rem;
+                        background: linear-gradient(90deg, #D4AF37, #FFD700);
+                        color: #0D0D0D;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: 1rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.transform='translateY(-2px)';"
+                    onmouseout="this.style.transform='translateY(0)';"
+                >
+                    📋 Copy to Clipboard
+                </button>
+                """
+
+                st.markdown(copy_code, unsafe_allow_html=True)
 
 # Tab 2 - History
 with tab2:
@@ -198,7 +238,7 @@ with tab3:
     except Exception as e:
         st.error("Something went wrong with the analysis.")
 
-# Footer (no credits/inspiration)
+# Footer (no credits)
 st.markdown("""
 ---
 <p class="footer">
