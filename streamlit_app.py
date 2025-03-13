@@ -11,50 +11,66 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Streamlit page config
-# Centered Footer with hover tooltip fixed
+st.set_page_config(
+    page_title="BayaanBot - Roman Urdu Poetry Generator",
+    page_icon="🖋️",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
+
+# Custom CSS for styling + tooltip fix
 st.markdown("""
----
-<style>
-.footer-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 50px;
-    margin-bottom: 20px;
-}
+    <style>
+    .stApp {
+        background: linear-gradient(to bottom right, #1A1A1D, #0D0D0D);
+        color: #F0EAD6;
+        font-family: 'Georgia', serif;
+    }
 
-.footer {
-    position: relative;
-    display: inline-block;
-    font-size: 14px;
-    color: #F0EAD6;
-}
+    h1 {
+        color: #D4AF37 !important;
+    }
 
-.footer span:hover::after {
-    content: " Hassan Haseen & Sameen Muzaffar ";
-    position: absolute;
-    top: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    white-space: nowrap;
-    font-size: 0.8rem;
-    opacity: 1;
-    z-index: 10;
-}
-</style>
+    .stTextInput > div > div > input {
+        background-color: #262730;
+        color: #F0EAD6;
+    }
 
-<div class="footer-container">
-    <p class="footer">
-        Created with ❤️ by <span>BayaanBot Team</span>
-    </p>
-</div>
+    .stButton > button {
+        background: linear-gradient(90deg, #D4AF37, #FFD700);
+        color: #0D0D0D;
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
+    }
+
+    .footer {
+        position: relative;
+        display: inline-block;
+    }
+
+    .footer span:hover::after {
+        content: " Hassan Haseen & Sameen Muzaffar ";
+        position: absolute;
+        top: -30px;
+        right: 0;  /* align it with the right edge */
+        transform: translateX(0%);  /* no centering offset */
+        background-color: #333;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        white-space: nowrap;
+        font-size: 0.8rem;
+        opacity: 1;
+        z-index: 10;
+    }
+    </style>
 """, unsafe_allow_html=True)
-
-
 
 # Cache the model and encoders
 @st.cache_resource
