@@ -7,7 +7,6 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from src.utils import load_history, save_to_history
 import os
 
-# Suppress TensorFlow CPU warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 st.set_page_config(
@@ -17,7 +16,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS
 st.markdown("""
     <style>
     .stApp {
@@ -86,7 +84,6 @@ def generate_poetry(start_text, words_per_line, total_lines, model, word_to_inde
 
     return formatted_poetry
 
-# Load model and encoder
 model, word_to_index, index_to_word = load_model_and_encoder()
 
 st.title("🖋️ BayaanBot")
@@ -107,8 +104,8 @@ with tab1:
 
     with col2:
         st.subheader("⚙️ Settings")
-        words_per_line = st.slider("Words per Line", 3, 15, 5)
-        total_lines = st.slider("Total Lines", 2, 10, 5)
+        words_per_line = st.slider("Words per Line", 3, 15, 5, help="How many words in each line of poetry")
+        total_lines = st.slider("Total Lines", 2, 10, 5, help="How many lines you want in your poetry")
 
     if st.button("✨ Generate", use_container_width=True):
         with st.spinner("Generating your Bayaan..."):
@@ -116,10 +113,7 @@ with tab1:
 
             if poetry:
                 st.markdown("### 📝 Generated Poetry")
-
-                # Display poetry with built-in copy button
                 st.code(poetry, language=None)
-
                 save_to_history(poetry, start_text)
 
 with tab2:
@@ -156,12 +150,12 @@ with tab3:
     except Exception as e:
         st.error("Something went wrong with the analysis.")
 
-# ✅ Centered footer with ❓ hover
+# ✅ Centered footer with a help-style ❓ icon
 st.markdown("""
 ---
 <div style="text-align:center; font-size: 16px; color: #F0EAD6;">
     Created with ❤️ by 
     <span style="font-weight:bold;">BayaanBot Team</span>
-    <span style="margin-left: 5px; cursor: pointer;" title="Hassan Haseen & Sameen Muzaffar">❓</span>
+    <span title="Hassan Haseen & Sameen Muzaffar" style="margin-left: 8px; cursor: help;">❓</span>
 </div>
 """, unsafe_allow_html=True)
