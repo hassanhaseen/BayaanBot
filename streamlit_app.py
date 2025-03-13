@@ -47,21 +47,6 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
     }
-
-    .footer span:hover::after {
-        content: " Hassan Haseen & Sameen Muzaffar ";
-        position: absolute;
-        bottom: 125%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #333;
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        white-space: nowrap;
-        font-size: 0.8rem;
-        opacity: 1;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -132,10 +117,6 @@ with tab1:
             if poetry:
                 st.markdown("### 📝 Generated Poetry")
 
-                # Dynamic height based on number of lines (optional in st.code)
-                line_count = len(poetry.strip().split('\n'))
-                height = min(600, 25 * line_count + 50)
-
                 # Display poetry with built-in copy button
                 st.code(poetry, language=None)
 
@@ -175,9 +156,12 @@ with tab3:
     except Exception as e:
         st.error("Something went wrong with the analysis.")
 
+# ✅ Centered footer with ❓ hover
 st.markdown("""
 ---
-<p class="footer">
-    Created with ❤️ by <span>BayaanBot Team</span>
-</p>
+<div style="text-align:center; font-size: 16px; color: #F0EAD6;">
+    Created with ❤️ by 
+    <span style="font-weight:bold;">BayaanBot Team</span>
+    <span style="margin-left: 5px; cursor: pointer;" title="Hassan Haseen & Sameen Muzaffar">❓</span>
+</div>
 """, unsafe_allow_html=True)
