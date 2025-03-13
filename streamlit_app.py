@@ -7,7 +7,6 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 from src.utils import load_history, save_to_history
 
-# Page configuration
 st.set_page_config(
     page_title="BayaanBot - Roman Urdu Poetry Generator",
     page_icon="🖋️",
@@ -15,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for styling
+# Custom CSS
 st.markdown("""
     <style>
     .stApp {
@@ -25,16 +24,6 @@ st.markdown("""
     }
 
     h1 {
-        color: #D4AF37 !important;
-        font-size: 3.5rem !important;
-    }
-
-    h5 {
-        color: #F0EAD6 !important;
-        font-size: 1.3rem !important;
-    }
-
-    .subheader {
         color: #D4AF37 !important;
     }
 
@@ -46,9 +35,6 @@ st.markdown("""
     .stButton > button {
         background: linear-gradient(90deg, #D4AF37, #FFD700);
         color: #0D0D0D;
-        padding: 0.75rem 1.5rem;
-        font-size: 1.1rem;
-        font-weight: 600;
         border: none;
         border-radius: 8px;
         transition: all 0.3s ease;
@@ -57,33 +43,6 @@ st.markdown("""
     .stButton > button:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
-    }
-
-    .poetry-output {
-        background: rgba(38, 39, 48, 0.8);
-        color: #F0EAD6;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border: 2px solid #D4AF3722;
-        margin-top: 1.5rem;
-        line-height: 2.2;
-        font-size: 1.3rem;
-        text-align: left;
-        white-space: pre-wrap;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .footer {
-        text-align: center;
-        padding: 2rem 0;
-        color: #808495;
-        margin-top: 3rem;
-        border-top: 1px solid #D4AF3722;
-    }
-
-    .footer span {
-        position: relative;
-        cursor: pointer;
     }
 
     .footer span:hover::after {
@@ -99,82 +58,63 @@ st.markdown("""
         white-space: nowrap;
         font-size: 0.8rem;
         opacity: 1;
-        transition: opacity 0.3s;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Load model and encoder
 @st.cache_resource
 def load_model_and_encoder():
-    try:
-        model = tf.keras.models.load_model("models/poetry_gru_model.h5")
-        with open("models/word_encoder.pkl", "rb") as f:
-            word_encoder = pickle.load(f)
+    model = tf.keras.models.load_model("models/poetry_gru_model.h5")
+    with open("models/word_encoder.pkl", "rb") as f:
+        word_encoder = pickle.load(f)
 
-        word_to_index = {word: i for i, word in enumerate(word_encoder.classes_)}
-        index_to_word = {i: word for word, i in word_to_index.items()}
+    word_to_index = {word: i for i, word in enumerate(word_encoder.classes_)}
+    index_to_word = {i: word for word, i in word_to_index.items()}
 
-        return model, word_to_index, index_to_word
-    except Exception as e:
-        st.error(f"Error loading model or encoder: {str(e)}")
-        return None, None, None
+    return model, word_to_index, index_to_word
 
-# Generate poetry function
 def generate_poetry(start_text, words_per_line, total_lines, model, word_to_index, index_to_word):
-    try:
-        generated_words = start_text.strip().split() if start_text else []
+    generated_words = start_text.strip().split() if start_text else []
 
-        while len([w for w in generated_words if w != '\n']) < (words_per_line * total_lines):
-            encoded_input = [word_to_index.get(word, 0) for word in generated_words[-5:]]
-            encoded_input = pad_sequences([encoded_input], maxlen=5, truncating="pre")
+    while len([w for w in generated_words if w != '\n']) < (words_per_line * total_lines):
+        encoded_input = [word_to_index.get(word, 0) for word in generated_words[-5:]]
+        encoded_input = pad_sequences([encoded_input], maxlen=5, truncating="pre")
 
-            predicted_probs = model.predict(encoded_input, verbose=0)
-            predicted_index = np.argmax(predicted_probs, axis=-1)[0]
-            next_word = index_to_word.get(predicted_index, "")
+        predicted_probs = model.predict(encoded_input, verbose=0)
+        predicted_index = np.argmax(predicted_probs, axis=-1)[0]
+        next_word = index_to_word.get(predicted_index, "")
 
-            if not next_word:
-                continue
+        if not next_word:
+            continue
 
-            generated_words.append(next_word)
+        generated_words.append(next_word)
 
-            # Insert a line break after every N words
-            if len([w for w in generated_words if w != '\n']) % words_per_line == 0:
-                generated_words.append('\n')
+        if len([w for w in generated_words if w != '\n']) % words_per_line == 0:
+            generated_words.append('\n')
 
-        # Remove any leading/trailing newlines and extra spaces
-        poetry_lines = ' '.join(generated_words).strip().split('\n')
-        formatted_poetry = '\n'.join(line.strip() for line in poetry_lines if line.strip())
+    # Clean up spaces, remove extra spaces and newlines
+    poetry_lines = ' '.join(generated_words).strip().split('\n')
+    cleaned_lines = [line.strip() for line in poetry_lines if line.strip()]
+    formatted_poetry = '\n'.join(cleaned_lines)
 
-        return formatted_poetry
-
-    except Exception as e:
-        st.error(f"🚫 Error generating poetry: {str(e)}")
-        return ""
+    return formatted_poetry
 
 # Load model and encoder
 model, word_to_index, index_to_word = load_model_and_encoder()
 
-if not all([model, word_to_index, index_to_word]):
-    st.error("⚠️ Failed to load required components.")
-    st.stop()
-
-# Header
 st.title("🖋️ BayaanBot")
 st.markdown("##### Express your thoughts in Roman Urdu Poetry powered by AI")
 
-# Tabs
 tab1, tab2, tab3 = st.tabs(["Generate Poetry", "History", "Analysis"])
 
-# Tab 1 - Generate Poetry
 with tab1:
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.subheader("🖋️ Compose Your Bayaan")  # Updated title
+        st.subheader("🖋️ Compose Your Bayaan")
         start_text = st.text_input(
             "Starting Words",
-            value="",  # Empty by default
+            value="",
             help="Enter your opening words in Roman Urdu"
         )
 
@@ -190,43 +130,14 @@ with tab1:
             if poetry:
                 st.markdown("### 📝 Generated Poetry")
 
-                poetry_lines = poetry.strip().split('\n')
-                formatted_poetry = "<br>".join([f"{line.strip()}" for line in poetry_lines])
-
-                st.markdown(f"""
-                    <div class="poetry-output">
-                        {formatted_poetry}
-                    </div>
-                """, unsafe_allow_html=True)
+                # Display the poetry in a text area (removes alignment/space issues)
+                st.text_area(label="", value=poetry, height=300)
 
                 save_to_history(poetry, start_text)
 
-                # Copy to Clipboard button (custom styled)
-                copy_code = f"""
-                <button onclick="navigator.clipboard.writeText(`{poetry}`)" 
-                    style="
-                        display: block;
-                        margin-top: 1rem;
-                        padding: 0.75rem 1.5rem;
-                        background: linear-gradient(90deg, #D4AF37, #FFD700);
-                        color: #0D0D0D;
-                        border: none;
-                        border-radius: 8px;
-                        font-size: 1rem;
-                        font-weight: 600;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                    "
-                    onmouseover="this.style.transform='translateY(-2px)';"
-                    onmouseout="this.style.transform='translateY(0)';"
-                >
-                    📋 Copy to Clipboard
-                </button>
-                """
+                # Simple copy button (Streamlit-native)
+                st.download_button("📋 Copy to Clipboard", poetry, file_name="BayaanBot_Poetry.txt")
 
-                st.markdown(copy_code, unsafe_allow_html=True)
-
-# Tab 2 - History
 with tab2:
     st.subheader("📚 Poetry History")
     history = load_history()
@@ -238,7 +149,6 @@ with tab2:
     else:
         st.info("No poetry history yet. Start generating your Bayaan!")
 
-# Tab 3 - Analysis
 with tab3:
     st.subheader("📊 Poetry Stats")
     try:
@@ -262,7 +172,6 @@ with tab3:
     except Exception as e:
         st.error("Something went wrong with the analysis.")
 
-# Footer with team hover names
 st.markdown("""
 ---
 <p class="footer">
