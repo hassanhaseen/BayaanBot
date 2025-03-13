@@ -80,6 +80,27 @@ st.markdown("""
         margin-top: 3rem;
         border-top: 1px solid #D4AF3722;
     }
+
+    .footer span {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .footer span:hover::after {
+        content: " Hassan Haseen & Sameen Muzaffar ";
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        white-space: nowrap;
+        font-size: 0.8rem;
+        opacity: 1;
+        transition: opacity 0.3s;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -121,7 +142,10 @@ def generate_poetry(start_text, words_per_line, total_lines, model, word_to_inde
             if len([w for w in generated_words if w != '\n']) % words_per_line == 0:
                 generated_words.append('\n')
 
-        formatted_poetry = ' '.join(generated_words).replace(' \n ', '\n').strip()
+        # Remove any leading/trailing newlines and extra spaces
+        poetry_lines = ' '.join(generated_words).strip().split('\n')
+        formatted_poetry = '\n'.join(line.strip() for line in poetry_lines if line.strip())
+
         return formatted_poetry
 
     except Exception as e:
@@ -147,7 +171,7 @@ with tab1:
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.subheader("🎯 Start Your Nazam")
+        st.subheader("🖋️ Compose Your Bayaan")  # Updated title
         start_text = st.text_input(
             "Starting Words",
             value="",  # Empty by default
@@ -238,10 +262,10 @@ with tab3:
     except Exception as e:
         st.error("Something went wrong with the analysis.")
 
-# Footer (no credits)
+# Footer with team hover names
 st.markdown("""
 ---
 <p class="footer">
-    Created with ❤️ by BayaanBot Team
+    Created with ❤️ by <span>BayaanBot Team</span>
 </p>
 """, unsafe_allow_html=True)
