@@ -125,7 +125,7 @@ with tab1:
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.subheader("🖋️ Compose Your Bayaan")
+        st.subheader("✍️ Compose Your Bayaan")
         start_text = st.text_input(
             "Starting Words",
             value="",
