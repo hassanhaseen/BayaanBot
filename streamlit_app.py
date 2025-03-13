@@ -49,6 +49,11 @@ st.markdown("""
         box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
     }
 
+    .footer {
+    position: relative;
+    display: inline-block;
+}
+
     .footer span:hover::after {
     content: " Hassan Haseen & Sameen Muzaffar ";
     position: absolute;
