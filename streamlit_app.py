@@ -2,16 +2,12 @@ import streamlit as st
 import numpy as np
 import tensorflow as tf
 import pickle
-import os
 from datetime import datetime
-import json
-import base64
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-# Custom module imports (from src/)
 from src.utils import load_history, save_to_history
 
-# Page config
+# Page configuration
 st.set_page_config(
     page_title="BayaanBot - Roman Urdu Poetry Generator",
     page_icon="🖋️",
@@ -19,23 +15,67 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS (same as before)
+# Custom CSS for styling
 st.markdown("""
     <style>
-    /* ... your dark + gold theme CSS here ... */
+    .stApp {
+        background: linear-gradient(to bottom right, #1A1A1D, #0D0D0D);
+        color: #F0EAD6;
+        font-family: 'Georgia', serif;
+    }
+
+    h1 {
+        color: #D4AF37 !important;
+        font-size: 3.5rem !important;
+    }
+
+    h5 {
+        color: #F0EAD6 !important;
+        font-size: 1.3rem !important;
+    }
+
+    .subheader {
+        color: #D4AF37 !important;
+    }
+
+    .stTextInput > div > div > input {
+        background-color: #262730;
+        color: #F0EAD6;
+    }
+
+    .stButton > button {
+        background: linear-gradient(90deg, #D4AF37, #FFD700);
+        color: #0D0D0D;
+    }
+
+    .poetry-output {
+        background: rgba(38, 39, 48, 0.8);
+        color: #F0EAD6;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #D4AF3722;
+        margin-top: 1.5rem;
+        line-height: 1.8;
+        font-size: 1.2rem;
+    }
+
+    .footer {
+        text-align: center;
+        padding: 2rem 0;
+        color: #808495;
+        margin-top: 3rem;
+        border-top: 1px solid #D4AF3722;
+    }
+
     </style>
 """, unsafe_allow_html=True)
 
-# Utility functions (this stays if not moved to utils.py)
-def get_download_link(text, filename, link_text):
-    b64 = base64.b64encode(text.encode()).decode()
-    return f'<a href="data:text/plain;base64,{b64}" download="{filename}" class="download-button">📥 {link_text}</a>'
-
+# Load model and encoder
 @st.cache_resource
 def load_model_and_encoder():
     try:
-        model = tf.keras.models.load_model("models/poetry_gru_model.h5")  # <-- updated path
-        with open("models/word_encoder.pkl", "rb") as f:                  # <-- updated path
+        model = tf.keras.models.load_model("models/poetry_gru_model.h5")
+        with open("models/word_encoder.pkl", "rb") as f:
             word_encoder = pickle.load(f)
 
         word_to_index = {word: i for i, word in enumerate(word_encoder.classes_)}
@@ -46,11 +86,13 @@ def load_model_and_encoder():
         st.error(f"Error loading model or encoder: {str(e)}")
         return None, None, None
 
+# Generate poetry function
 def generate_poetry(start_text, words_per_line, total_lines, model, word_to_index, index_to_word):
     try:
-        generated_text = start_text.split()
-        for _ in range(total_lines * words_per_line):
-            encoded_input = [word_to_index.get(word, 0) for word in generated_text[-5:]]
+        generated_words = start_text.strip().split() if start_text else []
+
+        while len([w for w in generated_words if w != '\n']) < (words_per_line * total_lines):
+            encoded_input = [word_to_index.get(word, 0) for word in generated_words[-5:]]
             encoded_input = pad_sequences([encoded_input], maxlen=5, truncating="pre")
 
             predicted_probs = model.predict(encoded_input, verbose=0)
@@ -60,12 +102,15 @@ def generate_poetry(start_text, words_per_line, total_lines, model, word_to_inde
             if not next_word:
                 continue
 
-            generated_text.append(next_word)
+            generated_words.append(next_word)
 
-            if len(generated_text) % words_per_line == 0:
-                generated_text.append("\n")
+            # Insert a line break after every N words
+            if len([w for w in generated_words if w != '\n']) % words_per_line == 0:
+                generated_words.append('\n')
 
-        return " ".join(generated_text)
+        formatted_poetry = ' '.join(generated_words).replace(' \n ', '\n').strip()
+        return formatted_poetry
+
     except Exception as e:
         st.error(f"🚫 Error generating poetry: {str(e)}")
         return ""
@@ -74,7 +119,7 @@ def generate_poetry(start_text, words_per_line, total_lines, model, word_to_inde
 model, word_to_index, index_to_word = load_model_and_encoder()
 
 if not all([model, word_to_index, index_to_word]):
-    st.error("⚠️ Failed to load required components. Please check if all files exist.")
+    st.error("⚠️ Failed to load required components.")
     st.stop()
 
 # Header
@@ -84,6 +129,7 @@ st.markdown("##### Express your thoughts in Roman Urdu Poetry powered by AI")
 # Tabs
 tab1, tab2, tab3 = st.tabs(["Generate Poetry", "History", "Analysis"])
 
+# Tab 1 - Generate Poetry
 with tab1:
     col1, col2 = st.columns([2, 1])
 
@@ -91,7 +137,7 @@ with tab1:
         st.subheader("🎯 Start Your Nazam")
         start_text = st.text_input(
             "Starting Words",
-            value="dil ke armaan",
+            value="",  # Empty starting input as requested
             help="Enter your opening words in Roman Urdu"
         )
 
@@ -106,20 +152,17 @@ with tab1:
 
             if poetry:
                 st.markdown("### 📝 Generated Poetry")
-                st.markdown(f'<div class="poetry-output">{poetry.replace("\\n", "<br>")}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="poetry-output">{poetry}</div>', unsafe_allow_html=True)
 
-                st.markdown(get_download_link(
-                    poetry,
-                    f"Bayaan_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
-                    "📥 Download Poetry"
-                ), unsafe_allow_html=True)
-
+                # Save to history (without download option)
                 save_to_history(poetry, start_text)
 
+                # Copy to clipboard button
                 if st.button("📋 Copy to Clipboard"):
-                    st.write('<script>navigator.clipboard.writeText(`' + poetry + '`);</script>', unsafe_allow_html=True)
+                    st.write(f'<script>navigator.clipboard.writeText(`{poetry}`);</script>', unsafe_allow_html=True)
                     st.success("Copied to clipboard!")
 
+# Tab 2 - History
 with tab2:
     st.subheader("📚 Poetry History")
     history = load_history()
@@ -128,15 +171,10 @@ with tab2:
         for idx, entry in enumerate(reversed(history)):
             with st.expander(f"🕒 {entry['date']} - Prompt: {entry['prompt'][:30]}..."):
                 st.text_area("Poetry", entry['poetry'], height=150, key=f"history_{idx}")
-
-                st.markdown(get_download_link(
-                    entry['poetry'],
-                    f"Bayaan_{entry['date'].replace(' ', '_')}.txt",
-                    "📥 Download"
-                ), unsafe_allow_html=True)
     else:
         st.info("No poetry history yet. Start generating your Bayaan!")
 
+# Tab 3 - Analysis
 with tab3:
     st.subheader("📊 Poetry Stats")
     try:
@@ -160,11 +198,10 @@ with tab3:
     except Exception as e:
         st.error("Something went wrong with the analysis.")
 
-# Footer
+# Footer (no credits/inspiration)
 st.markdown("""
 ---
 <p class="footer">
-    Created with ❤️ by BayaanBot Team |
-    <a href="https://github.com/shaiiikh/Nazam-Generator-using-GRU" target="_blank">Inspiration Repo</a>
+    Created with ❤️ by BayaanBot Team
 </p>
 """, unsafe_allow_html=True)
