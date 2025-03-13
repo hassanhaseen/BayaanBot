@@ -4,8 +4,11 @@ import tensorflow as tf
 import pickle
 from datetime import datetime
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-
 from src.utils import load_history, save_to_history
+import os
+
+# Suppress TensorFlow CPU warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 st.set_page_config(
     page_title="BayaanBot - Roman Urdu Poetry Generator",
@@ -64,7 +67,7 @@ st.markdown("""
 
 @st.cache_resource
 def load_model_and_encoder():
-    model = tf.keras.models.load_model("models/poetry_gru_model.h5")
+    model = tf.keras.models.load_model("models/poetry_gru_model.h5", compile=False)
     with open("models/word_encoder.pkl", "rb") as f:
         word_encoder = pickle.load(f)
 
@@ -92,7 +95,6 @@ def generate_poetry(start_text, words_per_line, total_lines, model, word_to_inde
         if len([w for w in generated_words if w != '\n']) % words_per_line == 0:
             generated_words.append('\n')
 
-    # Clean up spaces, remove extra spaces and newlines
     poetry_lines = ' '.join(generated_words).strip().split('\n')
     cleaned_lines = [line.strip() for line in poetry_lines if line.strip()]
     formatted_poetry = '\n'.join(cleaned_lines)
@@ -130,13 +132,14 @@ with tab1:
             if poetry:
                 st.markdown("### 📝 Generated Poetry")
 
-                # Display the poetry in a text area (removes alignment/space issues)
-                st.text_area(label="", value=poetry, height=300)
+                # Dynamic height based on number of lines (optional in st.code)
+                line_count = len(poetry.strip().split('\n'))
+                height = min(600, 25 * line_count + 50)
+
+                # Display poetry with built-in copy button
+                st.code(poetry, language=None)
 
                 save_to_history(poetry, start_text)
-
-                # Simple copy button (Streamlit-native)
-                st.download_button("📋 Copy to Clipboard", poetry, file_name="BayaanBot_Poetry.txt")
 
 with tab2:
     st.subheader("📚 Poetry History")
