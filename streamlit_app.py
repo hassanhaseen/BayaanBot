@@ -7,9 +7,10 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from src.utils import load_history, save_to_history
 import os
 
-# Suppress TensorFlow CPU warnings
+# Suppress TensorFlow warnings (CUDA, etc.)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+# Streamlit page config
 st.set_page_config(
     page_title="BayaanBot - Roman Urdu Poetry Generator",
     page_icon="🖋️",
@@ -17,7 +18,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for UI styling
+# Custom CSS for styling
 st.markdown("""
     <style>
     .stApp {
@@ -47,9 +48,25 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
     }
+
+    .footer span:hover::after {
+        content: " Hassan Haseen & Sameen Muzaffar ";
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        white-space: nowrap;
+        font-size: 0.8rem;
+        opacity: 1;
+    }
     </style>
 """, unsafe_allow_html=True)
 
+# Cache the model and encoders
 @st.cache_resource
 def load_model_and_encoder():
     model = tf.keras.models.load_model("models/poetry_gru_model.h5", compile=False)
@@ -61,6 +78,7 @@ def load_model_and_encoder():
 
     return model, word_to_index, index_to_word
 
+# Generate poetry logic
 def generate_poetry(start_text, words_per_line, total_lines, model, word_to_index, index_to_word):
     generated_words = start_text.strip().split() if start_text else []
 
@@ -86,17 +104,17 @@ def generate_poetry(start_text, words_per_line, total_lines, model, word_to_inde
 
     return formatted_poetry
 
-# Load model and encoder
+# Load model and encoders
 model, word_to_index, index_to_word = load_model_and_encoder()
 
-# App Title
+# App Title & Subtitle
 st.title("🖋️ BayaanBot")
 st.markdown("##### Express your thoughts in Roman Urdu Poetry powered by AI")
 
-# Tabs
+# App Tabs
 tab1, tab2, tab3 = st.tabs(["Generate Poetry", "History", "Analysis"])
 
-# Generate Poetry Tab
+# Tab 1: Generate Poetry
 with tab1:
     col1, col2 = st.columns([2, 1])
 
@@ -120,12 +138,13 @@ with tab1:
             if poetry:
                 st.markdown("### 📝 Generated Poetry")
 
-                # Display poetry in code block with built-in copy button
+                # Display poetry with built-in copy button
                 st.code(poetry, language=None)
 
+                # Save generated poetry to history
                 save_to_history(poetry, start_text)
 
-# History Tab
+# Tab 2: Poetry History
 with tab2:
     st.subheader("📚 Poetry History")
     history = load_history()
@@ -137,7 +156,7 @@ with tab2:
     else:
         st.info("No poetry history yet. Start generating your Bayaan!")
 
-# Analysis Tab
+# Tab 3: Poetry Analysis
 with tab3:
     st.subheader("📊 Poetry Stats")
     try:
@@ -161,11 +180,10 @@ with tab3:
     except Exception as e:
         st.error("Something went wrong with the analysis.")
 
-# Centered Footer and Help Icon
-st.markdown("---")
-
-footer_col = st.columns([1, 1, 1])
-
-with footer_col[1]:
-    st.markdown("<p style='text-align:center; color:#F0EAD6;'>Created with ❤️ by BayaanBot Team</p>", unsafe_allow_html=True)
-    st.info("Developed by Hassan Haseen & Sameen Muzaffar", icon="ℹ️")
+# Centered Footer
+st.markdown("""
+---
+<p class="footer" style="text-align: center;">
+    Created with ❤️ by <span>BayaanBot Team</span>
+</p>
+""", unsafe_allow_html=True)
