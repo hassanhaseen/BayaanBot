@@ -18,7 +18,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for styling
+# Custom CSS for styling + tooltip fix
 st.markdown("""
     <style>
     .stApp {
@@ -50,25 +50,25 @@ st.markdown("""
     }
 
     .footer {
-    position: relative;
-    display: inline-block;
-}
+        position: relative;
+        display: inline-block;
+    }
 
     .footer span:hover::after {
-    content: " Hassan Haseen & Sameen Muzaffar ";
-    position: absolute;
-    top: -30px; /* closer to the element */
-    left: 50%; /* horizontal centering */
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    white-space: nowrap;
-    font-size: 0.8rem;
-    opacity: 1;
-    z-index: 10;
-}
+        content: " Hassan Haseen & Sameen Muzaffar ";
+        position: absolute;
+        top: -30px;
+        right: 0;  /* align it with the right edge */
+        transform: translateX(0%);  /* no centering offset */
+        background-color: #333;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        white-space: nowrap;
+        font-size: 0.8rem;
+        opacity: 1;
+        z-index: 10;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -186,7 +186,7 @@ with tab3:
     except Exception as e:
         st.error("Something went wrong with the analysis.")
 
-# Centered Footer
+# Centered Footer with hover tooltip fixed
 st.markdown("""
 ---
 <p class="footer" style="text-align: center;">
