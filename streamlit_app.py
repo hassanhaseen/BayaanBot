@@ -11,74 +11,49 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Streamlit page config
+# Centered Footer with hover tooltip fixed
 st.markdown("""
-    <style>
-    .stApp {
-        background: linear-gradient(to bottom right, #1A1A1D, #0D0D0D);
-        color: #F0EAD6;
-        font-family: 'Georgia', serif;
-    }
+---
+<style>
+.footer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
 
-    h1 {
-        color: #D4AF37 !important;
-    }
+.footer {
+    position: relative;
+    display: inline-block;
+    font-size: 14px;
+    color: #F0EAD6;
+}
 
-    .stTextInput > div > div > input {
-        background-color: #262730;
-        color: #F0EAD6;
-    }
+.footer span:hover::after {
+    content: " Hassan Haseen & Sameen Muzaffar ";
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    opacity: 1;
+    z-index: 10;
+}
+</style>
 
-    .stButton > button {
-        background: linear-gradient(90deg, #D4AF37, #FFD700);
-        color: #0D0D0D;
-        border: none;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
-    }
-
-    .footer-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 50px;
-        margin-bottom: 20px;
-    }
-
-    .footer {
-        position: relative;
-        display: inline-block;
-        font-size: 14px;
-        color: #F0EAD6;
-    }
-
-    .footer span:hover::after {
-        content: " Hassan Haseen & Sameen Muzaffar ";
-        position: absolute;
-        top: -35px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #333;
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        white-space: nowrap;
-        font-size: 0.8rem;
-        opacity: 1;
-        z-index: 10;
-    }
-    </style>
-
-    <div class="footer-container">
-        <p class="footer">
-            Created with ❤️ by <span>BayaanBot Team</span>
-        </p>
-    </div>
+<div class="footer-container">
+    <p class="footer">
+        Created with ❤️ by <span>BayaanBot Team</span>
+    </p>
+</div>
 """, unsafe_allow_html=True)
+
 
 
 # Cache the model and encoders
