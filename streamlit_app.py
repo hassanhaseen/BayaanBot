@@ -50,19 +50,20 @@ st.markdown("""
     }
 
     .footer span:hover::after {
-        content: " Hassan Haseen & Sameen Muzaffar ";
-        position: absolute;
-        bottom: 125%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #333;
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        white-space: nowrap;
-        font-size: 0.8rem;
-        opacity: 1;
-    }
+    content: " Hassan Haseen & Sameen Muzaffar ";
+    position: absolute;
+    top: -30px; /* closer to the element */
+    left: 50%; /* horizontal centering */
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    opacity: 1;
+    z-index: 10;
+}
     </style>
 """, unsafe_allow_html=True)
 
