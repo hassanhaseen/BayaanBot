@@ -4,6 +4,7 @@ import tensorflow as tf
 import pickle
 from datetime import datetime
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+
 from src.utils import load_history, save_to_history
 
 st.set_page_config(
@@ -13,8 +14,53 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-st.title("🖋️ BayaanBot")
-st.markdown("##### Express your thoughts in Roman Urdu Poetry powered by AI")
+# Custom CSS
+st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(to bottom right, #1A1A1D, #0D0D0D);
+        color: #F0EAD6;
+        font-family: 'Georgia', serif;
+    }
+
+    h1 {
+        color: #D4AF37 !important;
+    }
+
+    .stTextInput > div > div > input {
+        background-color: #262730;
+        color: #F0EAD6;
+    }
+
+    .stButton > button {
+        background: linear-gradient(90deg, #D4AF37, #FFD700);
+        color: #0D0D0D;
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
+    }
+
+    .footer span:hover::after {
+        content: " Hassan Haseen & Sameen Muzaffar ";
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        white-space: nowrap;
+        font-size: 0.8rem;
+        opacity: 1;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 @st.cache_resource
 def load_model_and_encoder():
@@ -46,6 +92,7 @@ def generate_poetry(start_text, words_per_line, total_lines, model, word_to_inde
         if len([w for w in generated_words if w != '\n']) % words_per_line == 0:
             generated_words.append('\n')
 
+    # Clean up spaces, remove extra spaces and newlines
     poetry_lines = ' '.join(generated_words).strip().split('\n')
     cleaned_lines = [line.strip() for line in poetry_lines if line.strip()]
     formatted_poetry = '\n'.join(cleaned_lines)
@@ -55,6 +102,9 @@ def generate_poetry(start_text, words_per_line, total_lines, model, word_to_inde
 # Load model and encoder
 model, word_to_index, index_to_word = load_model_and_encoder()
 
+st.title("🖋️ BayaanBot")
+st.markdown("##### Express your thoughts in Roman Urdu Poetry powered by AI")
+
 tab1, tab2, tab3 = st.tabs(["Generate Poetry", "History", "Analysis"])
 
 with tab1:
@@ -62,7 +112,11 @@ with tab1:
 
     with col1:
         st.subheader("🖋️ Compose Your Bayaan")
-        start_text = st.text_input("Starting Words", value="", help="Enter your opening words in Roman Urdu")
+        start_text = st.text_input(
+            "Starting Words",
+            value="",
+            help="Enter your opening words in Roman Urdu"
+        )
 
     with col2:
         st.subheader("⚙️ Settings")
@@ -75,8 +129,14 @@ with tab1:
 
             if poetry:
                 st.markdown("### 📝 Generated Poetry")
-                st.code(poetry, language=None)  # Automatic copy button
+
+                # Display the poetry in a text area (removes alignment/space issues)
+                st.text_area(label="", value=poetry, height=300)
+
                 save_to_history(poetry, start_text)
+
+                # Simple copy button (Streamlit-native)
+                st.download_button("📋 Copy to Clipboard", poetry, file_name="BayaanBot_Poetry.txt")
 
 with tab2:
     st.subheader("📚 Poetry History")
@@ -91,27 +151,30 @@ with tab2:
 
 with tab3:
     st.subheader("📊 Poetry Stats")
-    if 'poetry' in locals():
-        stats1, stats2 = st.columns(2)
+    try:
+        if 'poetry' in locals():
+            stats1, stats2 = st.columns(2)
 
-        with stats1:
-            words = poetry.split()
-            st.metric("Total Words", len(words))
-            st.metric("Unique Words", len(set(words)))
-            richness = (len(set(words)) / len(words) * 100) if words else 0
-            st.metric("Vocabulary Richness", f"{richness:.1f}%")
+            with stats1:
+                words = poetry.split()
+                st.metric("Total Words", len(words))
+                st.metric("Unique Words", len(set(words)))
+                richness = (len(set(words)) / len(words) * 100) if words else 0
+                st.metric("Vocabulary Richness", f"{richness:.1f}%")
 
-        with stats2:
-            lines = [line for line in poetry.split('\n') if line.strip()]
-            st.metric("Total Lines", len(lines))
-            avg_words = (len(words) / len(lines)) if lines else 0
-            st.metric("Avg Words per Line", f"{avg_words:.1f}")
-    else:
-        st.info("Generate poetry first to view stats!")
+            with stats2:
+                lines = [line for line in poetry.split('\n') if line.strip()]
+                st.metric("Total Lines", len(lines))
+                avg_words = (len(words) / len(lines)) if lines else 0
+                st.metric("Avg Words per Line", f"{avg_words:.1f}")
+        else:
+            st.info("Generate poetry first to view stats!")
+    except Exception as e:
+        st.error("Something went wrong with the analysis.")
 
 st.markdown("""
 ---
-<p style="text-align:center;">
-    Created with ❤️ by <span title="Hassan Haseen & Sameen Muzaffar">BayaanBot Team</span>
+<p class="footer">
+    Created with ❤️ by <span>BayaanBot Team</span>
 </p>
 """, unsafe_allow_html=True)
