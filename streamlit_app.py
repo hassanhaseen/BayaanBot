@@ -190,6 +190,6 @@ with tab3:
 st.markdown("""
 ---
 <p class="footer" style="text-align: center;">
-    Created with ❤️ by <span>BayaanBot Team</span>
+    Created with ❤️ by <span>Team CodeRunners</span>
 </p>
 """, unsafe_allow_html=True)
