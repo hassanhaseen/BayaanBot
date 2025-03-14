@@ -50,8 +50,8 @@ The trained GRU model (`poetry_gru_model.h5`) predicts the next word in the sequ
 ## 🤝 Team CodeRunners
 
 Developed with ❤️ by:  
-- **Hassan Haseen**(https://github.com/hassanhaseen)  
-- **Sameen Muzaffar**(https://github.com/SameenRajpoot)
+- **[Hassan Haseen](https://github.com/hassanhaseen)**  
+- **[Sameen Muzaffar](https://github.com/SameenRajpoot)**
 
 Hover over `Team CodeRunners` in the app footer to see our names! 🎉
 
