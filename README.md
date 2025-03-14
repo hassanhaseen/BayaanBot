@@ -23,7 +23,7 @@ Welcome to **BayaanBot** — an AI-powered Roman Urdu Poetry Generator designed 
 
 ## 📸 Preview
 
-| Home Page | Generated Poetry | Poetry Stats |
+| Home Page | History Page | Analysis Page |
 |-----------|------------------|--------------|
 | ![Home](https://i.imgur.com/5CXc4iD.png) | ![Generated](https://i.imgur.com/qfTc3Rx.png) | ![Stats](https://i.imgur.com/3wvbMEN.png) |
 
