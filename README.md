@@ -1,17 +1,6 @@
-<table>
-<tr>
-<td>
+# 🖋️ BayaanBot - Roman Urdu Poetry Generator
 
-# 🖋️ BayaanBot  
-### Roman Urdu Poetry Generator  
-Express your thoughts through AI-generated poetry in Roman Urdu.
-
-</td>
-<td align="right">
-  <img src="https://github.com/hassanhaseen/BayaanBot/blob/main/assets/logo.png?raw=true" alt="BayaanBot Logo" width="150" />
-</td>
-</tr>
-</table>
+<img src="https://github.com/hassanhaseen/BayaanBot/blob/main/assets/logo.png?raw=true" alt="BayaanBot Logo" width="150" align="right" />
 
 Welcome to **BayaanBot** — an AI-powered Roman Urdu Poetry Generator designed to inspire the poet within you. Whether you're a seasoned poet or someone exploring creative writing, BayaanBot makes it effortless to compose heartfelt poetry in Roman Urdu.
 
