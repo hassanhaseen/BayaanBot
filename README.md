@@ -10,8 +10,8 @@ Welcome to **BayaanBot** — an AI-powered Roman Urdu Poetry Generator designed 
 
 ✅ Generate beautiful Roman Urdu poetry with AI  
 ✅ Customize your poetry with:  
-   🎛️ Words per line  
-   📝 Total number of lines  
+        🎛️ Words per line  
+        📝 Total number of lines  
 ✅ Clean, intuitive and minimal UI  
 ✅ Built-in copy button to easily grab your poetry  
 ✅ Keeps a history of your generated poetry  
