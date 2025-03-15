@@ -29,6 +29,12 @@ Welcome to **BayaanBot** — an AI-powered Roman Urdu Poetry Generator designed 
 
 ---
 
+## ✍️ Medium Blog
+
+🔗 [Read out my Medium Blog](https://medium.com/@hassanhaseen/bayyan-bot-an-ai-powered-roman-urdu-poetry-generator-1ba0903ec9ed)
+
+---
+
 ## 🚀 Live Demo
 
 🔗 [Try BayaanBot Live on Streamlit!](https://bayaanbot.streamlit.app/)
